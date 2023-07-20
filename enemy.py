@@ -3,15 +3,15 @@ import math
 from pygame.math import Vector2
 
 
-
 class Enemy(pg.sprite.Sprite):
     def __init__(self, waypoints, image):
         pg.sprite.Sprite.__init__(self)
+
         self.target = None
         self.waypoints = waypoints
         self.pos = Vector2(self.waypoints[0])
         self.target_waypoint = 1
-        self.speed = 2
+        self.speed = 1
         self.angle = 0
 
         self.original_image = image
@@ -48,7 +48,7 @@ class Enemy(pg.sprite.Sprite):
         #calculate dist to next waypoint
         dist = self.target - self.pos
         #use distance to calculate angle
-        self.angle = math.degrees(math.atan2(-dist[1],dist[0]))
+        self.angle = math.degrees(math.atan2(-dist[1], dist[0]))
         #rotate and update rect
         self.image = pg.transform.rotate(self.original_image, self.angle)
         self.rect = self.image.get_rect()
