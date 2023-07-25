@@ -53,17 +53,17 @@ class Turret(pg.sprite.Sprite):
     def load_images(self, sprite_sheet):
         size = sprite_sheet.get_height()
         animation_list = []
-        for x in range(c.Turret_Constants.ANIMATION_STEPS):
+        for x in range(c.TurretConstants.ANIMATION_STEPS):
             temp_img = sprite_sheet.subsurface(x * size, 0, size, size)
             animation_list.append(temp_img)
         return animation_list
 
-    def update(self, enemy_group):
+    def update(self, enemy_group, world):
         #timing animation
         if self.target:
             self.play_animation()
         else:
-            if pg.time.get_ticks() - self.last_shot > self.cooldown:
+            if pg.time.get_ticks() - self.last_shot > (self.cooldown / world.game_speed):
                 self.pick_target(enemy_group)
 
     def pick_target(self, enemy_group):
@@ -71,18 +71,21 @@ class Turret(pg.sprite.Sprite):
         x_dist = 0
         y_dist = 0
         for enemy in enemy_group:
-            x_dist = enemy.pos[0] - self.x
-            y_dist = enemy.pos[1] - self.y
-            dist = math.sqrt(x_dist ** 2 + y_dist ** 2)
-            if dist < self.range:
-                self.target = enemy
-                self.angle = math.degrees(math.atan2(-y_dist, x_dist))
-                print('target selected')
+            if enemy.health > 0:
+                x_dist = enemy.pos[0] - self.x
+                y_dist = enemy.pos[1] - self.y
+                dist = math.sqrt(x_dist ** 2 + y_dist ** 2)
+                if dist < self.range:
+                    self.target = enemy
+                    self.angle = math.degrees(math.atan2(-y_dist, x_dist))
+                    #DEAL DAMAGE
+                    self.target.health -= c.TurretConstants.DAMAGE
+                    break
 
 
     def play_animation(self):
         self.original_image = self.animation_list[self.frame_index]
-        if pg.time.get_ticks() - self.update_time > c.Turret_Constants.ANIMATION_DELAY:
+        if pg.time.get_ticks() - self.update_time > c.TurretConstants.ANIMATION_DELAY:
             self.update_time = pg.time.get_ticks()
             self.frame_index += 1
             if self.frame_index >= len(self.animation_list):

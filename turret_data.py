@@ -1,22 +1,22 @@
 TURRET_DATA = [
     {
         #ARCHER
-        'range': 140,
+        'range': 120,
         'cooldown': 280,
     },
     {
         #ROGUE
-        'range': 240,
+        'range': 140,
         'cooldown': 240,
     },
     {
         #MAGE
-        'range': 340,
+        'range': 160,
         'cooldown': 200,
     },
     {
         #WIZARD
-        'range': 440,
+        'range': 180,
         'cooldown': 160,
     },
 ]
