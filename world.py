@@ -18,6 +18,14 @@ class World():
                     waypoint_data = obj["polyline"]
                     self.process_waypoints(waypoint_data)
 
+    """GRASS = 0
+    GROUND = 1
+    #Word.is_tile(tile[x], World.GRASS
+    @staticmethod
+    def is_tile(search, who):
+        if search == World.GRASS:
+            return search in (124, 111)"""
+
 
     def process_waypoints(self, data):
         for point in data:
