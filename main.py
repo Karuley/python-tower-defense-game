@@ -18,6 +18,8 @@ clock = pg.time.Clock()
 #game window
 screen = pg.display.set_mode((c.Window.WIDTH + c.Window.SIDE_PANEL, c.Window.HEIGHT))
 pg.display.set_caption(c.Window.TITLE)
+Icon = pg.image.load('assets/imgs/castle.png')
+pg.display.set_icon(Icon)
 
 # =======================
 # GAME VARIABLES (to be moved?)
@@ -61,6 +63,12 @@ upgrade_turret_image = pg.image.load('assets/imgs/button/upgrade_button.png').co
 start_image = pg.image.load('assets/imgs/button/start_button.png').convert_alpha()
 restart_image = pg.image.load('assets/imgs/button/restart_button.png').convert_alpha()
 fast_image = pg.image.load('assets/imgs/button/fast_button.png').convert_alpha()
+
+#load world assets
+castle_big = pg.image.load('assets/imgs/castlebig.png').convert_alpha()
+castle = pg.image.load('assets/imgs/castle.png').convert_alpha()
+gold = pg.image.load('assets/imgs/gold.png').convert_alpha()
+logo = pg.image.load('assets/imgs/logo.png').convert_alpha()
 
 
 
@@ -131,12 +139,13 @@ turret_group = pg.sprite.Group()
 # =======================
 # CREATE BUTTONS
 # =======================
-turret_button = Button(c.Window.WIDTH + 30, 120, buy_turret_image, True)
-cancel_button = Button(c.Window.WIDTH + 30, 220, cancel_turret_image, True)
-upgrade_button = Button(c.Window.WIDTH + 30, 220, upgrade_turret_image, True)
-start_button = Button(c.Window.WIDTH + 30, 20, start_image, True)
+turret_button = Button(c.Window.WIDTH + 30, 240, buy_turret_image, True)
+cancel_button = Button(c.Window.WIDTH + 30, 340, cancel_turret_image, True)
+upgrade_button = Button(c.Window.WIDTH + 30, 240, upgrade_turret_image, True)
+start_button = Button(c.Window.WIDTH + 30, 140, start_image, True)
 restart_button = Button(310, 300, restart_image, True)
-fast_button = Button(c.Window.WIDTH + 30, 320, fast_image, False)
+fast_button = Button(c.Window.WIDTH + 30, 140, fast_image, False)
+
 
 
 #game loop
@@ -179,10 +188,14 @@ while run:
         turret.draw(screen)
 
     display_data()
-
-    draw_text(str(world.health), text_font, 'grey100', 20, 0)
-    draw_text(str(world.money), text_font, 'grey100', 20, 30)
-    draw_text(str(world.level), text_font, 'grey100', 20, 60)
+    screen.blit(logo, (c.Window.WIDTH + 7, 20))
+    screen.blit(castle_big, (17, (c.Window.HEIGHT - 100)))
+    screen.blit(castle, (c.Window.WIDTH + 20, 440))
+    screen.blit(gold, (c.Window.WIDTH + 20, 520))
+    draw_text(str(f'Health: {world.health}'), text_font, 'grey100', c.Window.WIDTH + 90, 470)
+    draw_text(str(f'Gold: {world.money}'), text_font, 'grey100', c.Window.WIDTH + 90, 540)
+    draw_text(str(f'Wave: {world.level}'), text_font, 'grey100', c.Window.WIDTH + 90, 620)
+    draw_text(str(f'Enemies: {len(world.enemy_list) - world.spawned_enemies}'), text_font, 'grey100', c.Window.WIDTH + 90, 700)
 
     if not game_over:
         #spawn enemies

@@ -11,7 +11,7 @@ class Window:
     HEIGHT = TILE_SIZE * ROWS#960
     FPS = 60
     TITLE = "Tower Defense"
-    #ICON = pygame.image.load("imgs/icon.png")
+    ICON = pygame.image.load('assets/imgs/logo.png')
 
 class TurretConstants:
     ANIMATION_STEPS = 8
