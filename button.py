@@ -8,17 +8,16 @@ class Button():
         self.clicked = False
         self.single_click = single_click
 
-    def draw(self, surface):
+    def draw_getclicked(self, surface):
         action = False
 
         #get mouse
         pos = pg.mouse.get_pos()
         #check click cond
-        if self.rect.collidepoint(pos):
-            if pg.mouse.get_pressed()[0] == 1 and not self.clicked:
-                action = True
-                if self.single_click:
-                    self.clicked = True
+        if self.rect.collidepoint(pos) and pg.mouse.get_pressed()[0] == 1 and not self.clicked:
+            action = True
+            if self.single_click:
+                self.clicked = True
 
         if pg.mouse.get_pressed()[0] == 0:
             self.clicked = False

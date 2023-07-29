@@ -48,6 +48,7 @@ for sprite in range(1, c.TurretConstants.TURRET_LEVELS + 1):
 
 
 cursor_turret = pg.image.load('assets/imgs/archer2.png').convert_alpha()
+cursor_turret_unable = pg.image.load('assets/imgs/archer2_unable.png').convert_alpha()
 #enemies
 enemy_images = {
     "slime": pg.image.load('assets/imgs/enemies/slime1.png').convert_alpha(),
@@ -63,13 +64,18 @@ upgrade_turret_image = pg.image.load('assets/imgs/button/upgrade_button.png').co
 start_image = pg.image.load('assets/imgs/button/start_button.png').convert_alpha()
 restart_image = pg.image.load('assets/imgs/button/restart_button.png').convert_alpha()
 fast_image = pg.image.load('assets/imgs/button/fast_button.png').convert_alpha()
+fast_image_pressed = pg.image.load('assets/imgs/button/fast_button_pressed.png').convert_alpha()
 
 #load world assets
 castle_big = pg.image.load('assets/imgs/castlebig.png').convert_alpha()
 castle = pg.image.load('assets/imgs/castle.png').convert_alpha()
 gold = pg.image.load('assets/imgs/gold.png').convert_alpha()
+wave_icon = pg.image.load('assets/imgs/placeholder.png').convert_alpha()
+enemy_icon = pg.image.load('assets/imgs/placeholder.png').convert_alpha()
 logo = pg.image.load('assets/imgs/logo.png').convert_alpha()
-
+player_lose = pg.image.load('assets/imgs/game_over.png').convert_alpha()
+player_win = pg.image.load('assets/imgs/game_won.png').convert_alpha()
+side_panel = pg.image.load('assets/imgs/side_pannel.png').convert_alpha()
 
 
 
@@ -91,8 +97,6 @@ def draw_text(text, font, text_col, x, y):
     img = font.render(text, True, text_col)
     screen.blit(img, (x, y))
 
-def display_data():
-    pg.draw.rect(screen, 'maroon', (c.Window.WIDTH, 0, c.Window.SIDE_PANEL, c.Window.HEIGHT))
 def create_turret(mouse_pos):
     mouse_tile_x = mouse_pos[0] // c.Window.TILE_SIZE
     mouse_tile_y = mouse_pos[1] // c.Window.TILE_SIZE
@@ -118,9 +122,26 @@ def select_turret(mouse_pos):
         if (mouse_tile_x, mouse_tile_y) == (turret.tile_x, turret.tile_y):
             return turret
 
+def show_turret_spaces(mouse_hover):
+    mouse_tile_x = mouse_hover[0] // c.Window.TILE_SIZE
+    mouse_tile_y = mouse_hover[1] // c.Window.TILE_SIZE
+    mouse_tile_num = (mouse_tile_y * c.Window.COLS) + mouse_tile_x
+    # check for grass
+    if world.tile_map[mouse_tile_num] == 25 or world.tile_map[mouse_tile_num] == 163:
+        screen.blit(cursor_turret, cursor_rect)
+
 def clear_selection():
     for turret in turret_group:
         turret.selected = False
+
+
+
+def title_screen():
+    castle_big = pg.image.load('assets/imgs/castlebig.png').convert_alpha()
+
+
+
+
     # =======================
     # CREATE WORLD
     # =======================
@@ -143,7 +164,7 @@ turret_button = Button(c.Window.WIDTH + 30, 240, buy_turret_image, True)
 cancel_button = Button(c.Window.WIDTH + 30, 340, cancel_turret_image, True)
 upgrade_button = Button(c.Window.WIDTH + 30, 240, upgrade_turret_image, True)
 start_button = Button(c.Window.WIDTH + 30, 140, start_image, True)
-restart_button = Button(310, 300, restart_image, True)
+restart_button = Button(640, 629, restart_image, True)
 fast_button = Button(c.Window.WIDTH + 30, 140, fast_image, False)
 
 
@@ -164,7 +185,7 @@ while run:
             game_over = True
 
         #check for all levels completed
-        if world.level > c.PlayerConstants.TOTAL_LEVELS:
+        elif world.level > c.PlayerConstants.TOTAL_LEVELS:
             game_win = True
             game_over = True
 
@@ -187,25 +208,28 @@ while run:
     for turret in turret_group:
         turret.draw(screen)
 
-    display_data()
+    screen.blit(side_panel, (c.Window.WIDTH, 0))
     screen.blit(logo, (c.Window.WIDTH + 7, 20))
     screen.blit(castle_big, (17, (c.Window.HEIGHT - 100)))
-    screen.blit(castle, (c.Window.WIDTH + 20, 440))
-    screen.blit(gold, (c.Window.WIDTH + 20, 520))
-    draw_text(str(f'Health: {world.health}'), text_font, 'grey100', c.Window.WIDTH + 90, 470)
-    draw_text(str(f'Gold: {world.money}'), text_font, 'grey100', c.Window.WIDTH + 90, 540)
-    draw_text(str(f'Wave: {world.level}'), text_font, 'grey100', c.Window.WIDTH + 90, 620)
-    draw_text(str(f'Enemies: {len(world.enemy_list) - world.spawned_enemies}'), text_font, 'grey100', c.Window.WIDTH + 90, 700)
+    screen.blit(castle, (c.Window.WIDTH + 30, 440))
+    screen.blit(gold, (c.Window.WIDTH + 30, 520))
+    screen.blit(wave_icon, (c.Window.WIDTH + 30, 600))
+    screen.blit(enemy_icon, (c.Window.WIDTH + 30, 680))
+    draw_text(str(f'Health: {world.health}'), text_font, 'grey100', c.Window.WIDTH + 110, 470)
+    draw_text(str(f'Gold: {world.money}'), text_font, 'grey100', c.Window.WIDTH + 110, 540)
+    draw_text(str(f'Wave: {world.level}'), text_font, 'grey100', c.Window.WIDTH + 110, 620)
+    draw_text(str(f'Enemies: {len(world.enemy_list) - world.spawned_enemies}'), text_font, 'grey100', c.Window.WIDTH + 110, 700)
 
     if not game_over:
         #spawn enemies
         #check for start button press
         if not level_started:
-            if start_button.draw(screen):
+            if start_button.draw_getclicked(screen):
                 level_started = True
         else:
             world.game_speed = 1
-            if fast_button.draw(screen):
+            if fast_button.draw_getclicked(screen):
+                screen.blit(fast_image_pressed, (c.Window.WIDTH + 30, 140))
                 world.game_speed = 2
             if pg.time.get_ticks() - last_enemy_spawn > c.EnemyConstants.SPAWN_COOLDOWN:
                 if world.spawned_enemies < len(world.enemy_list):
@@ -227,32 +251,47 @@ while run:
 
         #turret_group.draw(screen)
 
-        #draw buttons
-        if turret_button.draw(screen):
+        #SHOW TURRET CURSOR
+        if turret_button.draw_getclicked(screen) and not selected_turret:
             can_place_turrets = True
+
         if can_place_turrets:
             cursor_rect = cursor_turret.get_rect()
             cursor_pos = pg.mouse.get_pos()
             cursor_rect.center = cursor_pos
             if cursor_pos[0] <= c.Window.WIDTH:
-                screen.blit(cursor_turret, cursor_rect)
-            if cancel_button.draw(screen):
+                screen.blit(cursor_turret_unable, cursor_rect)
+                show_turret_spaces(mouse_hover)
+
+            if cancel_button.draw_getclicked(screen):
                 can_place_turrets = False
+
         #show upgrade buttom
-        if selected_turret:
+        if selected_turret and \
+                selected_turret.upgrade_level < c.TurretConstants.TURRET_LEVELS and \
+                    upgrade_button.draw_getclicked(screen) and \
+                        world.money >= c.TurretConstants.UPGRADE_COST:
+            selected_turret.upgrade()
+            world.money -= c.TurretConstants.UPGRADE_COST
+
+        """if selected_turret:
+            
             if selected_turret.upgrade_level < c.TurretConstants.TURRET_LEVELS:
                 if upgrade_button.draw(screen):
                     if world.money >= c.TurretConstants.UPGRADE_COST:
                         selected_turret.upgrade()
-                        world.money -= c.TurretConstants.UPGRADE_COST
+                        world.money -= c.TurretConstants.UPGRADE_COST"""
     else:
-
-        pg.draw.rect(screen, "dodgerblue", (200, 200, 400, 200), border_radius=30)
-        if game_win:
-            draw_text("GAME OVER", text_font, 'grey0', 0, 0)
+        """if game_win:
+            screen.blit(player_win, (0, 0))
         elif not game_win:
-            draw_text("CONGRATULATIONS", text_font, 'grey0', 0, 0)
-        if restart_button.draw(screen):
+            screen.blit(player_lose, (0, 0))"""
+
+        screen.blit(player_win if game_win else player_lose, (0, 0))
+        #ex ? TRUE : FALSE
+        #game_win ? player_win : player_lose
+
+        if restart_button.draw_getclicked(screen):
             game_over = False
             level_started = False
             can_place_turrets = False
@@ -275,20 +314,28 @@ while run:
         #quit game
         if event.type == pg.QUIT:
             run = False
+
+        #mouse hover test
+        if event.type == pg.MOUSEMOTION:
+            mouse_hover = pg.mouse.get_pos()
+
          #mouse click
-        if event.type == pg.MOUSEBUTTONDOWN and event.button == 1:
-            mouse_pos = pg.mouse.get_pos()
-            #check map boudaries
-            if mouse_pos[0] < c.Window.WIDTH and mouse_pos[1] < c.Window.HEIGHT:
-                #clear turret range
-                selected_turret = None
-                clear_selection()
-                if can_place_turrets:
-                    #check for money
-                    if world.money >= c.TurretConstants.BUY_COST:
+        if event.type == pg.MOUSEBUTTONDOWN:
+            if event.button == 3:
+                can_place_turrets = False
+
+            if event.button == 1:
+                mouse_pos = pg.mouse.get_pos()
+                #check map boudaries
+                if mouse_pos[0] < c.Window.WIDTH and mouse_pos[1] < c.Window.HEIGHT:
+                    #clear turret range
+                    selected_turret = None
+                    clear_selection()
+                    if can_place_turrets and world.money >= c.TurretConstants.BUY_COST: #can place & check for money
                         create_turret(mouse_pos)
-                else:
-                    selected_turret = select_turret(mouse_pos)
+                    else:
+                        selected_turret = select_turret(mouse_pos)
+
 
     pg.display.flip()
 

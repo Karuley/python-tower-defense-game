@@ -54,8 +54,9 @@ class World:
         random.shuffle(self.enemy_list)
 
     def check_level_complete(self):
-        if (self.killed_enemies + self.missed_enemies) == len(self.enemy_list):
-            return True
+        return self.killed_enemies + self.missed_enemies == len(self.enemy_list)
+        """if (self.killed_enemies + self.missed_enemies) == len(self.enemy_list):
+            return True"""
 
     def reset_wave(self):
         self.enemy_list = []
