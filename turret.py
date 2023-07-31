@@ -68,6 +68,7 @@ class Turret(pg.sprite.Sprite):
 
     def pick_target(self, enemy_group):
         #find target
+
         x_dist = 0
         y_dist = 0
         for enemy in enemy_group:

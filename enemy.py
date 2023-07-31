@@ -6,7 +6,7 @@ import configs as c
 
 
 class Enemy(pg.sprite.Sprite):
-    def __init__(self, enemy_type, waypoints, images):
+    def __init__(self, enemy_type, waypoints, sprite_sheets):
         pg.sprite.Sprite.__init__(self)
 
         self.target = None
@@ -19,16 +19,45 @@ class Enemy(pg.sprite.Sprite):
         self.target_waypoint = 1
         self.angle = 0
 
-        self.original_image = images.get(enemy_type)
+        self.original_image = sprite_sheets.get(enemy_type)
         self.image = pg.transform.rotate(self.original_image, self.angle)
         self.rect = self.image.get_rect()
         self.rect.center = self.pos
 
+        #--------------------------------------
+
+        self.sprite_sheets = sprite_sheets
+        self.animation_list = self.load_images(self.sprite_sheets.get(enemy_type))
+        self.frame_index = 0
+        self.update_time = pg.time.get_ticks()
+
+        self.original_image = self.animation_list[self.frame_index]
+        self.image = pg.transform.rotate(self.original_image, self.angle)
+        self.rect = self.image.get_rect()
+
+    def load_images(self, sprite_sheet):
+        size = 64
+        animation_list = []
+        for x in range(c.TurretConstants.ANIMATION_STEPS):
+            temp_img = sprite_sheet.subsurface(x * size, 0, size, size)
+            animation_list.append(temp_img)
+        return animation_list
+
+
     def update(self, world):
         self.move(world)
         self.rotate()
+        self.play_animation()
         self.check_alive(world)
 
+
+    def play_animation(self):
+        self.original_image = self.animation_list[self.frame_index]
+        if pg.time.get_ticks() - self.update_time > c.TurretConstants.ANIMATION_DELAY:
+            self.update_time = pg.time.get_ticks()
+            self.frame_index += 1
+            if self.frame_index >= len(self.animation_list):
+                self.frame_index = 0
     def move(self, world):
         # define target waypoint
 
