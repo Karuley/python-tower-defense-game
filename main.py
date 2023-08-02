@@ -2,13 +2,12 @@ import pygame as pg
 import json
 import random
 
-import configs
 import configs as c
 from enemy import Enemy
 from world import World
 from turret import Turret
 from button import Button
-from turret_data import TURRET_DATA
+
 
 pg.init()
 
@@ -33,7 +32,6 @@ can_place_turrets = False
 selected_turret = None
 on_title_screen = True
 
-
 # =======================
 # LOAD IMAGES (to be moved?)
 # =======================
@@ -46,10 +44,8 @@ for sprite in range(1, c.TurretConstants.TURRET_LEVELS + 1):
     turret_sheet = pg.image.load(f'assets/imgs/sheets/sheet{sprite}.png').convert_alpha()
     turret_spritesheets.append(turret_sheet)
 
-
-
-cursor_turret = pg.image.load('assets/imgs/archer2.png').convert_alpha()
-cursor_turret_unable = pg.image.load('assets/imgs/archer2_unable.png').convert_alpha()
+cursor_turret = pg.image.load('assets/imgs/archer.png').convert_alpha()
+cursor_turret_unable = pg.image.load('assets/imgs/archer_unable.png').convert_alpha()
 #enemies
 enemy_images = {
     "slime": pg.image.load('assets/imgs/enemies/slime_sheet1.png').convert_alpha(),
@@ -73,17 +69,16 @@ quit_game = pg.image.load('assets/imgs/button/quit_game_button.png').convert_alp
 
 #load world assets
 castle_big = pg.image.load('assets/imgs/castlebig.png').convert_alpha()
+forest_big = pg.image.load('assets/imgs/forest_big.png').convert_alpha()
 castle = pg.image.load('assets/imgs/castle.png').convert_alpha()
 gold = pg.image.load('assets/imgs/gold.png').convert_alpha()
-wave_icon = pg.image.load('assets/imgs/placeholder.png').convert_alpha()
+wave_icon = pg.image.load('assets/imgs/forest.png').convert_alpha()
 enemy_icon = pg.image.load('assets/imgs/placeholder.png').convert_alpha()
 logo = pg.image.load('assets/imgs/logo.png').convert_alpha()
 player_lose = pg.image.load('assets/imgs/game_over.png').convert_alpha()
 player_win = pg.image.load('assets/imgs/game_won.png').convert_alpha()
 side_panel = pg.image.load('assets/imgs/side_pannel.png').convert_alpha()
 title_screen = pg.image.load('assets/imgs/title_screen.png').convert_alpha()
-
-
 
 
 #json data for level
@@ -140,9 +135,10 @@ def clear_selection():
     for turret in turret_group:
         turret.selected = False
 
-    # =======================
-    # CREATE WORLD
-    # =======================
+
+# =======================
+# CREATE WORLD
+# =======================
 world = World(world_data, map_image)
 world.process_data()
 world.process_enemies()
@@ -152,8 +148,6 @@ world.process_enemies()
 # =======================
 enemy_group = pg.sprite.Group()
 turret_group = pg.sprite.Group()
-
-
 
 # =======================
 # CREATE BUTTONS
@@ -167,7 +161,6 @@ fast_button = Button(c.Window.WIDTH + 30, 140, fast_image, False)
 start_game = Button(686, 313, start_game_image, True)
 leave_game = Button(1562, 854, leave_game, True)
 quit_game = Button(686, 509, quit_game, True)
-
 
 
 #game loop
@@ -184,14 +177,12 @@ while run:
         if world.health <= 0:
             game_win = False
             game_over = True
-
         #check for all levels completed
         elif world.level > c.PlayerConstants.TOTAL_LEVELS:
             game_win = True
             game_over = True
 
-
-    #update groups
+        #update groups
         enemy_group.update(world)
         turret_group.update(enemy_group, world)
         if selected_turret:
@@ -219,6 +210,7 @@ while run:
         screen.blit(side_panel, (c.Window.WIDTH, 0))
         screen.blit(logo, (c.Window.WIDTH + 7, 20))
         screen.blit(castle_big, (17, (c.Window.HEIGHT - 100)))
+        screen.blit(forest_big, (1154, 0))
         screen.blit(castle, (c.Window.WIDTH + 30, 440))
         screen.blit(gold, (c.Window.WIDTH + 30, 520))
         screen.blit(wave_icon, (c.Window.WIDTH + 30, 600))
@@ -241,7 +233,6 @@ while run:
             enemy_group.empty()
             turret_group.empty()
         else:
-
             if not game_over:
                 #spawn enemies
                 #check for start button press
@@ -296,22 +287,16 @@ while run:
                     selected_turret.upgrade()
                     world.money -= c.TurretConstants.UPGRADE_COST
 
-                """if selected_turret:
-                    
-                    if selected_turret.upgrade_level < c.TurretConstants.TURRET_LEVELS:
-                        if upgrade_button.draw(screen):
-                            if world.money >= c.TurretConstants.UPGRADE_COST:
-                                selected_turret.upgrade()
-                                world.money -= c.TurretConstants.UPGRADE_COST"""
             else:
-                """if game_win:
+                if game_win:
                     screen.blit(player_win, (0, 0))
                 elif not game_win:
-                    screen.blit(player_lose, (0, 0))"""
+                    screen.blit(player_lose, (0, 0))
 
-                screen.blit(player_win if game_win else player_lose, (0, 0))
+                #had to comment, breaks event section
+                """screen.blit(player_win if game_win else player_lose, (0, 0))
                 #ex ? TRUE : FALSE
-                #game_win ? player_win : player_lose
+                #game_win ? player_win : player_lose"""
 
                 if restart_button.draw_getclicked(screen):
                     game_over = False
